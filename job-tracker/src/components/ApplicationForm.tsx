@@ -2,17 +2,41 @@
 
 import { useState, useEffect } from 'react';
 import { Application, Status } from '@/lib/types';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 interface ApplicationFormProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSubmit: (app: Application) => void;
   initial?: Application | null;
-  onClose: () => void;
 }
 
-const inputClass = "w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm";
-const labelClass = "block text-sm font-semibold text-slate-700 mb-1.5";
+const statusOptions: { value: Status; label: string }[] = [
+  { value: 'need-to-apply', label: 'Need to Apply' },
+  { value: 'applied', label: 'Applied' },
+  { value: 'interview', label: 'Interview' },
+  { value: 'rejected', label: 'Rejected' },
+  { value: 'offer', label: 'Offer' },
+];
 
-export default function ApplicationForm({ onSubmit, initial, onClose }: ApplicationFormProps) {
+export default function ApplicationForm({ open, onOpenChange, onSubmit, initial }: ApplicationFormProps) {
   const [companyName, setCompanyName] = useState('');
   const [jobRole, setJobRole] = useState('');
   const [link, setLink] = useState('');
@@ -32,8 +56,17 @@ export default function ApplicationForm({ onSubmit, initial, onClose }: Applicat
       setSource(initial.source);
       setStatus(initial.status);
       setNotes(initial.notes);
+    } else {
+      setCompanyName('');
+      setJobRole('');
+      setLink('');
+      setLocation('Remote');
+      setDateApplied(new Date().toISOString().split('T')[0]);
+      setSource('');
+      setStatus('need-to-apply');
+      setNotes('');
     }
-  }, [initial]);
+  }, [initial, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,128 +84,116 @@ export default function ApplicationForm({ onSubmit, initial, onClose }: Applicat
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-        <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-lg font-bold text-slate-900">{initial ? 'Edit Application' : 'New Application'}</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl leading-none transition-colors">&times;</button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="text-lg">{initial ? 'Edit Application' : 'New Application'}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelClass}>Company Name *</label>
-              <input
-                type="text"
+            <div className="space-y-2">
+              <Label htmlFor="company">Company Name</Label>
+              <Input
+                id="company"
                 required
                 value={companyName}
                 onChange={e => setCompanyName(e.target.value)}
-                className={inputClass}
                 placeholder="e.g. Google"
               />
             </div>
-            <div>
-              <label className={labelClass}>Job Role *</label>
-              <input
-                type="text"
+            <div className="space-y-2">
+              <Label htmlFor="role">Job Role</Label>
+              <Input
+                id="role"
                 required
                 value={jobRole}
                 onChange={e => setJobRole(e.target.value)}
-                className={inputClass}
                 placeholder="e.g. SDE Intern"
               />
             </div>
           </div>
 
-          <div>
-            <label className={labelClass}>Job Link</label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="link">Job Link</Label>
+            <Input
+              id="link"
               type="url"
               value={link}
               onChange={e => setLink(e.target.value)}
-              className={inputClass}
               placeholder="https://company.com/careers/..."
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelClass}>Location</label>
-              <select
-                value={location}
-                onChange={e => setLocation(e.target.value)}
-                className={inputClass}
-              >
-                <option>Remote</option>
-                <option>Hybrid</option>
-                <option>On-site</option>
-              </select>
+            <div className="space-y-2">
+              <Label>Location</Label>
+              <Select value={location} onValueChange={(v) => v && setLocation(v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Remote">Remote</SelectItem>
+                  <SelectItem value="Hybrid">Hybrid</SelectItem>
+                  <SelectItem value="On-site">On-site</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div>
-              <label className={labelClass}>Date Applied</label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="date">Date Applied</Label>
+              <Input
+                id="date"
                 type="date"
                 value={dateApplied}
                 onChange={e => setDateApplied(e.target.value)}
-                className={inputClass}
               />
             </div>
           </div>
 
-          <div>
-            <label className={labelClass}>Source</label>
-            <input
-              type="text"
+          <div className="space-y-2">
+            <Label htmlFor="source">Source</Label>
+            <Input
+              id="source"
               value={source}
               onChange={e => setSource(e.target.value)}
-              className={inputClass}
               placeholder="LinkedIn, Referral, Company site..."
             />
           </div>
 
-          <div>
-            <label className={labelClass}>Status</label>
-            <select
-              value={status}
-              onChange={e => setStatus(e.target.value as Status)}
-              className={inputClass}
-            >
-              <option value="need-to-apply">Need to Apply</option>
-              <option value="applied">Applied</option>
-              <option value="interview">Interview</option>
-              <option value="rejected">Rejected</option>
-              <option value="offer">Offer</option>
-            </select>
+          <div className="space-y-2">
+            <Label>Status</Label>
+            <Select value={status} onValueChange={(v) => v && setStatus(v as Status)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          <div>
-            <label className={labelClass}>Notes</label>
-            <textarea
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
               value={notes}
               onChange={e => setNotes(e.target.value)}
               rows={3}
-              className={`${inputClass} resize-none`}
               placeholder="Interview dates, follow-up reminders, feedback..."
             />
           </div>
 
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 font-medium text-sm transition-colors"
-            >
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium text-sm transition-colors shadow-sm"
-            >
+            </Button>
+            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700">
               {initial ? 'Save Changes' : 'Add Application'}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

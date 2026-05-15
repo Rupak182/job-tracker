@@ -5,6 +5,8 @@ import { Application, Status } from '@/lib/types';
 import { getApplications, saveApplication, updateApplication, deleteApplication } from '@/lib/store';
 import ApplicationTable from '@/components/ApplicationTable';
 import ApplicationForm from '@/components/ApplicationForm';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 const filters: { key: Status | 'all'; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -54,14 +56,6 @@ export default function Home() {
     }
   };
 
-  const handleStatusChange = (id: string, status: Status) => {
-    const app = applications.find(a => a.id === id);
-    if (app) {
-      updateApplication({ ...app, status });
-      refresh();
-    }
-  };
-
   const filtered = filter === 'all' ? applications : applications.filter(a => a.status === filter);
 
   const counts: Record<string, number> = {
@@ -80,21 +74,16 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Job Tracker</h1>
-            <p className="text-slate-500 text-sm mt-0.5">Track and manage your job applications</p>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Job Tracker</h1>
+            <p className="text-sm text-slate-500 mt-0.5">Track and manage your job applications</p>
           </div>
-          <button
-            onClick={() => { setEditing(null); setShowForm(true); }}
-            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-lg hover:bg-indigo-700 text-sm font-semibold transition-colors shadow-sm shadow-indigo-200"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+          <Button onClick={() => { setEditing(null); setShowForm(true); }} className="bg-indigo-600 hover:bg-indigo-700">
+            <Plus className="w-4 h-4 mr-2" />
             Add Application
-          </button>
+          </Button>
         </div>
 
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
           {filters.map(({ key, label }) => (
             <button
               key={key}
@@ -113,34 +102,27 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <ApplicationTable
             applications={filtered}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            onStatusChange={handleStatusChange}
           />
         </div>
 
         {applications.length > 0 && (
-          <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
-            <span>Showing {filtered.length} of {applications.length} applications</span>
-            <span className="flex items-center gap-4">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400" /> Remote</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400" /> Hybrid</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-400" /> On-site</span>
-            </span>
+          <div className="mt-4 text-xs text-slate-500">
+            Showing {filtered.length} of {applications.length} applications
           </div>
         )}
       </div>
 
-      {showForm && (
-        <ApplicationForm
-          onSubmit={handleSubmit}
-          initial={editing}
-          onClose={() => { setShowForm(false); setEditing(null); }}
-        />
-      )}
+      <ApplicationForm
+        open={showForm}
+        onOpenChange={setShowForm}
+        onSubmit={handleSubmit}
+        initial={editing}
+      />
     </div>
   );
 }
