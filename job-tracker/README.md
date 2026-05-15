@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Job Tracker
+
+A simple, lightweight job application tracker built with Next.js. Store and manage your job applications locally in your browser — no backend, no accounts, no setup.
+
+## Features
+
+- **Add applications** — Company name, job role, link, location, date, source, status, and notes
+- **Status tracking** — Need to Apply, Applied, Interview, Rejected, Offer
+- **Filter by status** — Quick filter tabs with counts
+- **Notes** — Hover over the note icon to see details without leaving the table
+- **Edit & Delete** — Manage your applications inline
+- **LocalStorage** — All data stored in your browser, works offline
+
+## Tech Stack
+
+- [Next.js 16](https://nextjs.org/) — App Router
+- [TypeScript](https://www.typescriptlang.org/) — Type safety
+- [Tailwind CSS](https://tailwindcss.com/) — Styling
+- [shadcn/ui](https://ui.shadcn.com/) — UI components
+- [Lucide React](https://lucide.dev/) — Icons
+- localStorage — Data persistence
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Data Storage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All data is stored in your browser's localStorage under the key `job-applications`. This means:
 
-## Learn More
+- No server or database needed
+- Works completely offline
+- Data is tied to your browser — clearing browser data will delete your applications
+- No sync across devices
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/
+│   ├── page.tsx          # Main dashboard
+│   ├── layout.tsx        # Root layout
+│   └── globals.css       # Global styles
+├── components/
+│   ├── ApplicationForm.tsx   # Add/Edit form (dialog)
+│   ├── ApplicationTable.tsx  # Applications table
+│   └── ui/                   # shadcn/ui components
+── lib/
+    ├── store.ts          # localStorage CRUD operations
+    └── types.ts          # TypeScript types
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
